@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  
+}
+
+// Модель пользователя
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  phone     String
+  password  String
+  referal   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([email])
+  @@index([username])
+}
+
+// Модель для данных об утилизации
+model Recycling {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   // Тип отходов (пластик, бумага и т.д.)
+  weight      Float    // Вес в кг
+  points      Int      // Заработанные баллы
+  description String?
+  createdAt   DateTime @default(now())
+  
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// Модель для отслеживания углеродного следа
+model CarbonFootprint {
+  id        String   @id @default(cuid())
+  userId    String
+  category  String   // Транспорт, энергия, питание и т.д.
+  amount    Float    // Количество CO2 в кг
+  date      DateTime
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([date])
+}
