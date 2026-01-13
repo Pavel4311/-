@@ -3,8 +3,10 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
+  console.log("📦 [API] Полученные данные:");
   try {
     const body = await request.json();
+    console.log("📦 [API] Полученные данные:", body);
     const { email, username, phone, password, referal } = body;
 
     // Валидация

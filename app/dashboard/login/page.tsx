@@ -46,14 +46,49 @@ export default function HomePage() {
       alert("Пожалуйста, примите политику конфиденциальности");
       setIsLoading(false);
       return;
-    } else {
-      alert("Форма успешно отправлена");
     }
 
-    await new Promise((res) => setTimeout(res, 2000));
+    try {
+      console.log("📤 [CLIENT] Отправка данных на сервер:", formData);
 
-    roter.push("/dashboard");
-    setIsLoading(false);
+      // ВОТ ЭТО ОТСУТСТВОВАЛО - fetch запрос на API
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      console.log("📥 [CLIENT] Получен ответ, статус:", response.status);
+
+      const data = await response.json();
+      console.log("📥 [CLIENT] Данные ответа:", data);
+
+      if (!response.ok) {
+        throw new Error(data.error || "Ошибка при регистрации");
+      }
+
+      // Успешная регистрация
+      alert(`✅ Регистрация успешна! Добро пожаловать, ${data.user.username}!`);
+
+      // Сохраняем данные пользователя в localStorage (опционально)
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Переходим на дашборд
+      roter.push("/dashboard");
+    } catch (error) {
+      console.error("💥 [CLIENT] Ошибка при регистрации:", error);
+      alert(
+        `❌ Ошибка: ${
+          error instanceof Error
+            ? error.message
+            : "Произошла неизвестная ошибка"
+        }`
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
