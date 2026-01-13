@@ -15,7 +15,7 @@ export default function HomePage() {
     password: string;
     phone: string;
     username: string;
-    referal: string;
+    referal?: string;
   }>({
     email: "",
     password: "",
@@ -151,7 +151,7 @@ export default function HomePage() {
               Тарифы
             </Link>
             <Link
-              href="/login"
+              href="/login1"
               className="px-6 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:shadow-lg hover:shadow-cyan-500/30 transition-all"
             >
               Войти
@@ -320,7 +320,7 @@ export default function HomePage() {
                   <p className="text-sm text-gray-400">
                     Уже есть аккаунт?{" "}
                     <Link
-                      href="/login"
+                      href="/navbar/login"
                       className="text-cyan-400 hover:text-cyan-300 transition-colors"
                     >
                       Войти
