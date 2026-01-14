@@ -1,11 +1,12 @@
 "use client";
 
-import { fi } from "date-fns/locale";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { TruckElectric } from "lucide-react";
 import Link from "next/link";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setisLoading] = useState(false);
@@ -28,8 +29,11 @@ export default function LoginPage() {
 
       if (response.ok) {
         const data = await response.json();
+        localStorage.setItem("userId", data.user.id);
         console.log("Успешный вход:", data);
         alert("Вы успешно вошли в систему!");
+
+        router.push("/dashboard/account");
       }
     } catch (error) {
       console.error("Ошибка при входе:", error);
