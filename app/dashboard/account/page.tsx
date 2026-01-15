@@ -1,7 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
 import Link from "next/link";
 import { TruckElectric, User, Mail, Phone, LogOut } from "lucide-react";
 
@@ -60,17 +59,6 @@ export default function AccountPage() {
     localStorage.removeItem("userId");
     router.push("/navbar/login");
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500 mx-auto mb-4"></div>
-          <p className="text-gray-400">Загрузка данных...</p>
-        </div>
-      </div>
-    );
-  }
 
   if (!user) {
     return null; // Или можно показать сообщение об ошибке

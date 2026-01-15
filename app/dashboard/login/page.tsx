@@ -3,12 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { set } from "date-fns";
-import { label } from "framer-motion/client";
-import { TruckElectric } from "lucide-react";
+import { Heart, Package, Users, TrendingUp } from "lucide-react";
 
-export default function HomePage() {
-  const roter = useRouter();
+export default function CharityHomePage() {
+  const router = useRouter();
 
   const [formData, setFormData] = useState<{
     email: string;
@@ -30,7 +28,6 @@ export default function HomePage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Проверяем заполненность полей перед отправкой
     if (
       formData.email === "" ||
       formData.password === "" ||
@@ -51,7 +48,6 @@ export default function HomePage() {
     try {
       console.log("📤 [CLIENT] Отправка данных на сервер:", formData);
 
-      // ВОТ ЭТО ОТСУТСТВОВАЛО - fetch запрос на API
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
@@ -69,14 +65,9 @@ export default function HomePage() {
         throw new Error(data.error || "Ошибка при регистрации");
       }
 
-      // Успешная регистрация
       alert(`✅ Регистрация успешна! Добро пожаловать, ${data.user.username}!`);
-
-      // Сохраняем данные пользователя в localStorage (опционально)
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      // Переходим на дашборд
-      roter.push("/dashboard");
+      localStorage.setItem("userId", data.user.id);
+      router.push("/dashboard");
     } catch (error) {
       console.error("💥 [CLIENT] Ошибка при регистрации:", error);
       alert(
@@ -95,64 +86,49 @@ export default function HomePage() {
     setIsChecked(e.target.checked);
   };
 
-  const handleCheckInput = () => {
-    const { email, password, phone, username, referal } = formData;
-    if (email !== "" && password !== "" && phone !== "" && username !== "") {
-      alert("Все поля заполнены");
-    } else {
-      alert("Пожалуйста, заполните все обязательные поля");
-    }
-  };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    if (type === "checkbox") {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: checked,
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
-      <nav className="border-b border-gray-800 py-4 px-6">
+    <div className="min-h-screen bg-gradient-to-br from-rose-900 via-purple-900 to-indigo-900 text-white">
+      {/* Навигация */}
+      <nav className="border-b border-white/10 py-4 px-6 backdrop-blur-sm bg-black/20">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center">
-              <TruckElectric className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-pink-500 to-rose-600 flex items-center justify-center">
+              <Heart className="w-6 h-6 fill-current" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-              EcoTrack
+            <span className="text-2xl font-bold bg-gradient-to-r from-pink-400 to-rose-400 bg-clip-text text-transparent">
+              GiveHope
             </span>
           </div>
           <div className="flex gap-6">
             <Link
               href="/about"
-              className="hover:text-cyan-300 transition-colors"
+              className="hover:text-pink-300 transition-colors"
             >
-              О нас
+              О проекте
             </Link>
             <Link
-              href="/features"
-              className="hover:text-cyan-300 transition-colors"
+              href="/catalog"
+              className="hover:text-pink-300 transition-colors"
             >
-              Возможности
+              Каталог товаров
             </Link>
             <Link
-              href="/pricing"
-              className="hover:text-cyan-300 transition-colors"
+              href="/projects"
+              className="hover:text-pink-300 transition-colors"
             >
-              Тарифы
+              Наши проекты
             </Link>
             <Link
-              href="/login1"
-              className="px-6 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:shadow-lg hover:shadow-cyan-500/30 transition-all"
+              href="/navbar/login"
+              className="px-6 py-2 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 hover:shadow-lg hover:shadow-pink-500/50 transition-all"
             >
               Войти
             </Link>
@@ -160,32 +136,36 @@ export default function HomePage() {
         </div>
       </nav>
 
+      {/* Главный контент */}
       <main className="pt-20 pb-32 px-4">
         <div className="max-w-7xl mx-auto">
+          {/* Заголовок */}
           <div className="text-center mb-16">
             <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-green-400 via-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-                Мониторинг и оптимизация
+              <span className="bg-gradient-to-r from-pink-400 via-rose-400 to-purple-400 bg-clip-text text-transparent">
+                Покупай с пользой
               </span>
               <br />
-              <span className="text-white">экологических показателей</span>
+              <span className="text-white">Помогай нуждающимся</span>
             </h1>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-10">
-              Современная платформа для отслеживания углеродного следа,
-              управления отходами и достижения целей устойчивого развития
+            <p className="text-xl text-gray-200 max-w-3xl mx-auto mb-10">
+              Приобретая товары на нашей платформе, вы помогаете детским домам,
+              приютам для животных и благотворительным организациям. 100%
+              прибыли идут на добрые дела! ❤️
             </p>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Форма регистрации */}
             <div className="space-y-8">
-              <div className="p-8 rounded-2xl bg-gradient-to-br from-gray-800/30 to-gray-900/30 border border-gray-700/50">
+              <div className="p-8 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20">
                 <h2 className="text-3xl font-bold mb-6">
-                  Начните работу с EcoTrack
+                  Присоединяйтесь к нам!
                 </h2>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-200 mb-2">
                       Email адрес *
                     </label>
                     <input
@@ -193,14 +173,14 @@ export default function HomePage() {
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-xl bg-gray-800/50 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-transparent transition-all"
                       placeholder="your@email.com"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-200 mb-2">
                       Имя пользователя *
                     </label>
                     <input
@@ -208,14 +188,14 @@ export default function HomePage() {
                       name="username"
                       value={formData.username}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-xl bg-gray-800/50 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-transparent transition-all"
                       placeholder="username"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-200 mb-2">
                       Телефон *
                     </label>
                     <input
@@ -223,14 +203,14 @@ export default function HomePage() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-xl bg-gray-800/50 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-transparent transition-all"
                       placeholder="+7 (999) 123-45-67"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-200 mb-2">
                       Пароль *
                     </label>
                     <input
@@ -238,14 +218,14 @@ export default function HomePage() {
                       name="password"
                       value={formData.password}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-xl bg-gray-800/50 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-transparent transition-all"
                       placeholder="Создайте надежный пароль"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-200 mb-2">
                       Реферальный код (опционально)
                     </label>
                     <input
@@ -253,8 +233,8 @@ export default function HomePage() {
                       name="referal"
                       value={formData.referal}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-xl bg-gray-800/50 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-transparent transition-all"
-                      placeholder="Введите код если есть"
+                      className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-transparent transition-all"
+                      placeholder="Пригласил друг? Введите код"
                     />
                   </div>
 
@@ -264,64 +244,54 @@ export default function HomePage() {
                       id="privacy"
                       checked={isChecked}
                       onChange={handleCheckboxChange}
-                      className="w-5 h-5 mt-1 rounded bg-gray-800 border-gray-700 text-cyan-500 focus:ring-cyan-500 focus:ring-offset-gray-900"
+                      className="w-5 h-5 mt-1 rounded bg-white/10 border-white/20 text-pink-500 focus:ring-pink-500"
                     />
-                    <label htmlFor="privacy" className="text-sm text-gray-300">
-                      Я принимаю условия использования и подтверждаю, что
-                      ознакомился с политикой конфиденциальности
+                    <label htmlFor="privacy" className="text-sm text-gray-200">
+                      Я принимаю условия использования и согласен с тем, что
+                      средства будут направлены на благотворительные цели
                     </label>
                   </div>
 
-                  <div className="flex gap-4">
-                    <button
-                      type="submit"
-                      disabled={isLoading}
-                      className="flex-1 py-4 px-6 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold hover:shadow-2xl hover:shadow-green-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isLoading ? (
-                        <span className="flex items-center justify-center">
-                          <svg
-                            className="animate-spin h-5 w-5 mr-3"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                              fill="none"
-                            />
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            />
-                          </svg>
-                          Обработка...
-                        </span>
-                      ) : (
-                        "Создать аккаунт"
-                      )}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleCheckInput}
-                      className="px-6 py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:shadow-2xl hover:shadow-cyan-500/30 transition-all duration-300"
-                    >
-                      Проверить
-                    </button>
-                  </div>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-pink-500 to-rose-600 text-white font-semibold hover:shadow-2xl hover:shadow-pink-500/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? (
+                      <span className="flex items-center justify-center">
+                        <svg
+                          className="animate-spin h-5 w-5 mr-3"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                            fill="none"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
+                        </svg>
+                        Обработка...
+                      </span>
+                    ) : (
+                      "Создать аккаунт"
+                    )}
+                  </button>
                 </form>
 
                 <div className="mt-6 text-center">
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-gray-300">
                     Уже есть аккаунт?{" "}
                     <Link
                       href="/navbar/login"
-                      className="text-cyan-400 hover:text-cyan-300 transition-colors"
+                      className="text-pink-400 hover:text-pink-300 transition-colors font-semibold"
                     >
                       Войти
                     </Link>
@@ -330,34 +300,40 @@ export default function HomePage() {
               </div>
             </div>
 
+            {/* Правая колонка с информацией */}
             <div className="space-y-8">
+              {/* Преимущества */}
               <div className="grid grid-cols-2 gap-6">
                 {features.map((feature, index) => (
                   <div
                     key={index}
-                    className="p-6 rounded-2xl bg-gradient-to-br from-gray-800/20 to-gray-900/20 border border-gray-700/30 hover:border-green-500/30 transition-all duration-300"
+                    className="p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 hover:border-pink-500/50 transition-all duration-300"
                   >
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/20 mb-4">
-                      <feature.icon className="w-6 h-6 text-green-400" />
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500/30 to-rose-500/30 mb-4">
+                      <feature.icon className="w-6 h-6 text-pink-300" />
                     </div>
                     <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-gray-300">
                       {feature.description}
                     </p>
                   </div>
                 ))}
               </div>
 
-              <div className="p-8 rounded-2xl bg-gradient-to-br from-gray-800/30 to-gray-900/30 border border-gray-700/50">
-                <h3 className="text-2xl font-bold mb-6">Наши достижения</h3>
+              {/* Статистика */}
+              <div className="p-8 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20">
+                <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                  <TrendingUp className="w-6 h-6 text-pink-400" />
+                  Наши достижения
+                </h3>
                 <div className="space-y-4">
                   {stats.map((stat, index) => (
                     <div
                       key={index}
                       className="flex items-center justify-between"
                     >
-                      <span className="text-gray-400">{stat.label}</span>
-                      <span className="font-bold text-lg text-green-400">
+                      <span className="text-gray-300">{stat.label}</span>
+                      <span className="font-bold text-lg text-pink-400">
                         {stat.value}
                       </span>
                     </div>
@@ -365,31 +341,40 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="p-8 rounded-2xl bg-gradient-to-br from-gray-800/30 to-gray-900/30 border border-gray-700/50">
-                <h3 className="text-2xl font-bold mb-6">Быстрый старт</h3>
+              {/* Как это работает */}
+              <div className="p-8 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20">
+                <h3 className="text-2xl font-bold mb-6">Как это работает?</h3>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center text-sm font-bold">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 flex items-center justify-center text-sm font-bold flex-shrink-0">
                       1
                     </div>
-                    <span className="text-gray-300">
-                      Зарегистрируйтесь в системе
+                    <span className="text-gray-200">
+                      Регистрируйтесь на платформе
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center text-sm font-bold">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 flex items-center justify-center text-sm font-bold flex-shrink-0">
                       2
                     </div>
-                    <span className="text-gray-300">
-                      Настройте источники данных
+                    <span className="text-gray-200">
+                      Выбирайте товары в каталоге
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center text-sm font-bold">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 flex items-center justify-center text-sm font-bold flex-shrink-0">
                       3
                     </div>
-                    <span className="text-gray-300">
-                      Получите первые отчеты и рекомендации
+                    <span className="text-gray-200">
+                      Деньги автоматически отправляются в фонды
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 flex items-center justify-center text-sm font-bold flex-shrink-0">
+                      4
+                    </div>
+                    <span className="text-gray-200">
+                      Отслеживайте, куда пошли средства
                     </span>
                   </div>
                 </div>
@@ -399,8 +384,21 @@ export default function HomePage() {
         </div>
       </main>
 
-      <footer className="border-t border-gray-800 py-8 text-center text-gray-400">
-        <p>EcoTrack © 2024 • Создано для устойчивого будущего</p>
+      {/* Футер */}
+      <footer className="border-t border-white/10 py-8 text-center text-gray-300 backdrop-blur-sm bg-black/20">
+        <p className="mb-2">
+          <Heart className="inline w-5 h-5 text-pink-400 fill-current mx-1" />
+          GiveHope © 2024 • Делаем мир добрее
+        </p>
+        <p className="text-sm">
+          Все средства направляются на благотворительность.
+          <Link
+            href="/transparency"
+            className="text-pink-400 hover:text-pink-300 ml-1"
+          >
+            Отчетность
+          </Link>
+        </p>
       </footer>
     </div>
   );
@@ -408,72 +406,30 @@ export default function HomePage() {
 
 const features = [
   {
-    icon: TruckElectric,
-    title: "Умный мониторинг",
-    description: "Автоматический сбор данных о выбросах",
+    icon: Heart,
+    title: "100% на добрые дела",
+    description: "Вся прибыль идет в благотворительные фонды",
   },
   {
-    icon: () => (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-        />
-      </svg>
-    ),
-    title: "Аналитика в реальном времени",
-    description: "Дашборды и отчеты по экологическим показателям",
+    icon: Package,
+    title: "Широкий ассортимент",
+    description: "Одежда, игрушки, книги, сувениры и многое другое",
   },
   {
-    icon: () => (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M13 10V3L4 14h7v7l9-11h-7z"
-        />
-      </svg>
-    ),
-    title: "Оптимизация процессов",
-    description: "Рекомендации по снижению углеродного следа",
+    icon: Users,
+    title: "Прозрачность",
+    description: "Видите куда идут ваши деньги в реальном времени",
   },
   {
-    icon: () => (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-        />
-      </svg>
-    ),
-    title: "Безопасность данных",
-    description: "Защищенное хранение экологической информации",
+    icon: TrendingUp,
+    title: "Реальная помощь",
+    description: "Поддержка детских домов, приютов и больниц",
   },
 ];
 
 const stats = [
-  { label: "Компаний используют", value: "1,200+" },
-  { label: "Снижение выбросов CO₂", value: "45%" },
-  { label: "Автоматизированных отчетов", value: "15,000" },
-  { label: "Подключенных датчиков", value: "8,500" },
+  { label: "Собрано средств", value: "12.5 млн ₽" },
+  { label: "Помогли организациям", value: "45+" },
+  { label: "Довольных покупателей", value: "8,200" },
+  { label: "Товаров продано", value: "25,000" },
 ];
