@@ -6,11 +6,17 @@ import { Category, Product, Charity, ProductCatalog } from "./interfaces";
 import { Heart, Search, Filter, ShoppingCart } from "lucide-react";
 import ProductCard from "./ui/card";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCart } from "./ui/cart";
 
 export default function DashboardPage() {
-  const [cart, setCart] = useState<Product[]>([]);
+  const router = useRouter();
+
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
+
+  // ✅ ИСПРАВЛЕНО: Используем правильный API из useCart
+  const { state, addItem } = useCart();
 
   const categories: Category[] = productsData.categories;
   const products: Product[] = productsData.products;
@@ -28,8 +34,9 @@ export default function DashboardPage() {
     ) as Product[];
   }
 
+  // ✅ ИСПРАВЛЕНО: Используем addItem из useCart
   const handleAddToCart = (product: Product) => {
-    setCart([...cart, product]);
+    addItem(product);
     alert(`Товар "${product.name}" добавлен в корзину!`);
   };
 
@@ -42,9 +49,12 @@ export default function DashboardPage() {
         p.tags.some((tag) => tag.toLowerCase().includes(lowerQuery))
     ) as Product[];
   }
+
   // Фильтрация товаров
   const filteredProducts = searchQuery
     ? searchProducts(searchQuery)
+    : selectedCategory === "all"
+    ? products
     : getProductsByCategory(selectedCategory);
 
   return (
@@ -80,14 +90,19 @@ export default function DashboardPage() {
             >
               Войти
             </Link>
-            <button className="relative p-2 hover:bg-white/10 rounded-lg transition-all">
+
+            {/* ✅ ИСПРАВЛЕНО: Используем state.itemCount */}
+            <Link
+              href="/dashboard/Cart"
+              className="relative p-2 hover:bg-white/10 rounded-lg transition-all"
+            >
               <ShoppingCart className="w-6 h-6" />
-              {cart.length > 0 && (
+              {state.itemCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-pink-500 rounded-full text-xs flex items-center justify-center">
-                  {cart.length}
+                  {state.itemCount}
                 </span>
               )}
-            </button>
+            </Link>
           </div>
         </div>
       </nav>
@@ -168,9 +183,10 @@ export default function DashboardPage() {
             <div className="text-3xl font-bold text-pink-400 mb-2">100%</div>
             <div className="text-sm text-gray-300">Прибыль на добрые дела</div>
           </div>
+          {/* ✅ ИСПРАВЛЕНО: Используем state.itemCount */}
           <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20">
             <div className="text-3xl font-bold text-pink-400 mb-2">
-              {cart.length}
+              {state.itemCount}
             </div>
             <div className="text-sm text-gray-300">Товаров в корзине</div>
           </div>

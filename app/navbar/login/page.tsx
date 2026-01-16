@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TruckElectric } from "lucide-react";
+import { Heart } from "lucide-react";
 import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setisLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,6 +18,9 @@ export default function LoginPage() {
       alert("Пожалуйста, заполните все поля.");
       return;
     }
+
+    setIsLoading(true);
+
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
@@ -34,6 +37,9 @@ export default function LoginPage() {
         alert("Вы успешно вошли в систему!");
 
         router.push("/dashboard/account");
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || "Ошибка входа. Проверьте данные.");
       }
     } catch (error) {
       console.error("Ошибка при входе:", error);
@@ -41,50 +47,38 @@ export default function LoginPage() {
     } finally {
       setEmailOrUsername("");
       setPassword("");
-      setisLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleEmailOrUsernameChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setEmailOrUsername(e.target.value);
-  };
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
+    <div className="min-h-screen bg-gradient-to-br from-rose-900 via-purple-900 to-indigo-900 text-white">
       {/* Навигация */}
-      <nav className="border-b border-gray-800 py-4 px-6">
+      <nav className="border-b border-white/10 py-4 px-6 backdrop-blur-sm bg-black/20">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center">
-              <TruckElectric className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-pink-500 to-rose-600 flex items-center justify-center">
+              <Heart className="w-6 h-6 fill-current" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-              EcoTrack
+            <span className="text-2xl font-bold bg-gradient-to-r from-pink-400 to-rose-400 bg-clip-text text-transparent">
+              GiveHope
             </span>
           </Link>
           <div className="flex gap-6">
+            <Link href="/" className="hover:text-pink-300 transition-colors">
+              Главная
+            </Link>
+            <Link
+              href="/dashboard"
+              className="hover:text-pink-300 transition-colors"
+            >
+              Каталог
+            </Link>
             <Link
               href="/about"
-              className="hover:text-cyan-300 transition-colors"
+              className="hover:text-pink-300 transition-colors"
             >
               О нас
-            </Link>
-            <Link
-              href="/features"
-              className="hover:text-cyan-300 transition-colors"
-            >
-              Возможности
-            </Link>
-            <Link
-              href="/pricing"
-              className="hover:text-cyan-300 transition-colors"
-            >
-              Тарифы
             </Link>
           </div>
         </div>
@@ -93,14 +87,17 @@ export default function LoginPage() {
       {/* Форма входа */}
       <div className="flex items-center justify-center min-h-[calc(100vh-80px)] px-4">
         <div className="w-full max-w-md">
-          <div className="bg-gray-800/50 backdrop-blur-lg rounded-2xl shadow-2xl border border-gray-700 p-8">
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 p-8">
             {/* Заголовок */}
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-2">
-                Вход в систему
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 flex items-center justify-center">
+                <Heart className="w-8 h-8 fill-current" />
+              </div>
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-400 to-rose-400 bg-clip-text text-transparent mb-2">
+                Вход в GiveHope
               </h2>
-              <p className="text-gray-400">
-                Войдите, чтобы продолжить работу с EcoTrack
+              <p className="text-gray-300">
+                Войдите, чтобы продолжить делать добрые дела
               </p>
             </div>
 
@@ -110,7 +107,7 @@ export default function LoginPage() {
               <div>
                 <label
                   htmlFor="emailOrUsername"
-                  className="block text-sm font-medium text-gray-300 mb-2"
+                  className="block text-sm font-medium text-gray-200 mb-2"
                 >
                   Email или Username
                 </label>
@@ -118,10 +115,10 @@ export default function LoginPage() {
                   type="text"
                   id="emailOrUsername"
                   value={emailOrUsername}
-                  onChange={handleEmailOrUsernameChange}
+                  onChange={(e) => setEmailOrUsername(e.target.value)}
                   placeholder="Введите email или username"
                   required
-                  className="w-full px-4 py-3 bg-gray-900/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-white placeholder-gray-400"
                 />
               </div>
 
@@ -129,7 +126,7 @@ export default function LoginPage() {
               <div>
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-gray-300 mb-2"
+                  className="block text-sm font-medium text-gray-200 mb-2"
                 >
                   Пароль
                 </label>
@@ -137,10 +134,10 @@ export default function LoginPage() {
                   type="password"
                   id="password"
                   value={password}
-                  onChange={handlePasswordChange}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="Введите пароль"
                   required
-                  className="w-full px-4 py-3 bg-gray-900/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-white placeholder-gray-400"
                 />
               </div>
 
@@ -150,18 +147,18 @@ export default function LoginPage() {
                   <input
                     type="checkbox"
                     id="remember"
-                    className="h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-600 rounded bg-gray-900"
+                    className="h-4 w-4 text-pink-500 focus:ring-pink-500 border-white/20 rounded bg-white/5"
                   />
                   <label
                     htmlFor="remember"
-                    className="ml-2 block text-sm text-gray-400"
+                    className="ml-2 block text-sm text-gray-300"
                   >
                     Запомнить меня
                   </label>
                 </div>
                 <Link
                   href="/forgot-password"
-                  className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+                  className="text-sm text-pink-400 hover:text-pink-300 transition-colors"
                 >
                   Забыли пароль?
                 </Link>
@@ -171,7 +168,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 px-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-lg hover:from-cyan-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 px-4 bg-gradient-to-r from-pink-500 to-rose-600 text-white font-semibold rounded-lg hover:from-pink-600 hover:to-rose-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -205,18 +202,18 @@ export default function LoginPage() {
 
             {/* Разделитель */}
             <div className="mt-6 flex items-center">
-              <div className="flex-1 border-t border-gray-700"></div>
-              <span className="px-4 text-sm text-gray-500">или</span>
-              <div className="flex-1 border-t border-gray-700"></div>
+              <div className="flex-1 border-t border-white/20"></div>
+              <span className="px-4 text-sm text-gray-400">или</span>
+              <div className="flex-1 border-t border-white/20"></div>
             </div>
 
             {/* Регистрация */}
             <div className="mt-6 text-center">
-              <p className="text-gray-400">
+              <p className="text-gray-300">
                 Нет аккаунта?{" "}
                 <Link
                   href="/dashboard/login"
-                  className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors"
+                  className="text-pink-400 hover:text-pink-300 font-semibold transition-colors"
                 >
                   Зарегистрироваться
                 </Link>
@@ -225,13 +222,13 @@ export default function LoginPage() {
           </div>
 
           {/* Дополнительная информация */}
-          <p className="text-center text-sm text-gray-500 mt-6">
+          <p className="text-center text-sm text-gray-400 mt-6">
             Нажимая «Войти», вы соглашаетесь с нашими{" "}
-            <Link href="/terms" className="text-cyan-400 hover:text-cyan-300">
+            <Link href="/terms" className="text-pink-400 hover:text-pink-300">
               Условиями использования
             </Link>{" "}
             и{" "}
-            <Link href="/privacy" className="text-cyan-400 hover:text-cyan-300">
+            <Link href="/privacy" className="text-pink-400 hover:text-pink-300">
               Политикой конфиденциальности
             </Link>
           </p>
