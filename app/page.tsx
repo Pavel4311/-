@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useMemo, memo } from "react";
 import {
   ArrowRight,
   Heart,
@@ -14,6 +15,57 @@ import {
 import Link from "next/link";
 
 export default function HomePage() {
+  const stats = useMemo(
+    () => [
+      { icon: Heart, value: "2.5M₽", label: "Собрано для благотворительности" },
+      { icon: Users, value: "10,000+", label: "Активных благотворителей" },
+      { icon: Gift, value: "5,000+", label: "Товаров продано" },
+    ],
+    [] // ← Пустой массив = вычисляется только один раз
+  );
+
+  const StatCard = memo(
+    ({ stat }: { stat: { icon: any; value: string; label: string } }) => {
+      const Icon = stat.icon;
+      return (
+        <div className="p-8 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20">
+          <Icon className="w-12 h-12 text-pink-400 mb-4" />
+          <div className="text-4xl font-bold text-white mb-2">{stat.value}</div>
+          <div className="text-gray-300">{stat.label}</div>
+        </div>
+      );
+    }
+  );
+  StatCard.displayName = "StatCard";
+
+  const FeatureCard = memo(
+    ({
+      feature,
+      index,
+    }: {
+      feature: { icon: any; title: string; description: string };
+      index: number;
+    }) => {
+      const Icon = feature.icon;
+      return (
+        <motion.div
+          key={feature.title}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: index * 0.1 }}
+          className="group p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-pink-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-pink-500/10"
+        >
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-pink-500/20 to-rose-500/20 mb-6">
+            <feature.icon className="w-7 h-7 text-pink-400" />
+          </div>
+          <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
+          <p className="text-gray-300">{feature.description}</p>
+        </motion.div>
+      );
+    }
+  );
+  FeatureCard.displayName = "FeatureCard";
+
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-rose-900 via-purple-900 to-indigo-900 text-white">
       {/* Hero Section */}
@@ -72,16 +124,7 @@ export default function HomePage() {
             className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8"
           >
             {stats.map((stat, index) => (
-              <div
-                key={stat.label}
-                className="p-8 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20"
-              >
-                <stat.icon className="w-12 h-12 text-pink-400 mb-4" />
-                <div className="text-4xl font-bold text-white mb-2">
-                  {stat.value}
-                </div>
-                <div className="text-gray-300">{stat.label}</div>
-              </div>
+              <StatCard key={index} stat={stat} />
             ))}
           </motion.div>
         </div>
@@ -96,19 +139,11 @@ export default function HomePage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <motion.div
+              <FeatureCard
                 key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="group p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-pink-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-pink-500/10"
-              >
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-pink-500/20 to-rose-500/20 mb-6">
-                  <feature.icon className="w-7 h-7 text-pink-400" />
-                </div>
-                <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                <p className="text-gray-300">{feature.description}</p>
-              </motion.div>
+                feature={feature}
+                index={index}
+              />
             ))}
           </div>
         </div>
@@ -180,12 +215,6 @@ export default function HomePage() {
     </div>
   );
 }
-
-const stats = [
-  { icon: Heart, value: "2.5M₽", label: "Собрано для благотворительности" },
-  { icon: Users, value: "10,000+", label: "Активных благотворителей" },
-  { icon: Gift, value: "5,000+", label: "Товаров продано" },
-];
 
 const features = [
   {

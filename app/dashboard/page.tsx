@@ -1,19 +1,21 @@
 "use client";
 
 import productsData from "./product.json";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Category, Product, Charity, ProductCatalog } from "./interfaces";
 import { Heart, Search, Filter, ShoppingCart } from "lucide-react";
 import ProductCard from "./ui/card";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "./ui/cart";
+import { useAnimatedCartAdd } from "@/lib/Animation";
 
 export default function DashboardPage() {
   const router = useRouter();
 
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const { addWithAnimation, isAnimating } = useAnimatedCartAdd();
 
   // ✅ ИСПРАВЛЕНО: Используем правильный API из useCart
   const { state, addItem } = useCart();
@@ -35,12 +37,17 @@ export default function DashboardPage() {
   }
 
   // ✅ ИСПРАВЛЕНО: Используем addItem из useCart
-  const handleAddToCart = (product: Product) => {
-    addItem(product);
-    alert(`Товар "${product.name}" добавлен в корзину!`);
-  };
+  const handleAddToCart = useCallback(
+    (product: Product) => {
+      addItem(product);
+      addWithAnimation(product, () => {
+        console.log(`Товар "${product.name}" добавлен в корзину!`);
+      });
+    },
+    [addWithAnimation, addItem]
+  );
 
-  function searchProducts(query: string): Product[] {
+  const searchProducts = useCallback((query: string): Product[] => {
     const lowerQuery = query.toLowerCase();
     return productsData.products.filter(
       (p) =>
@@ -48,7 +55,7 @@ export default function DashboardPage() {
         p.description.toLowerCase().includes(lowerQuery) ||
         p.tags.some((tag) => tag.toLowerCase().includes(lowerQuery))
     ) as Product[];
-  }
+  }, []);
 
   // Фильтрация товаров
   const filteredProducts = searchQuery
